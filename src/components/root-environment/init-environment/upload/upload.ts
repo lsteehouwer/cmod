@@ -41,11 +41,10 @@ export default class UploadDialogComponent extends Vue {
         this.hideError = false;
         let pmod = getModule(PetrinetModule, this.$store);
         let smod = getModule(SessionModule, this.$store);
-        pmod.register(this.file).then(() => {
-            pmod.get();
-            smod.register();
-        }).catch(() => {
 
-        });
+	pmod.register(this.file).then(() => {
+	    pmod.get();
+	    smod.register();
+	});
     }
 }

@@ -24,6 +24,7 @@ export default class PetrinetService {
             method: "post",
             data: fd,
             headers: {
+		"Accept": "application/json",
                 "Content-Type": "multipart/form-data",
             }
         };

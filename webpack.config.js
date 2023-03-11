@@ -7,14 +7,11 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 let config = {
     context: path.resolve(__dirname),
-    devtool: 'source_map',
+    devtool: 'eval-source-map',
     entry: path.resolve(__dirname, "src/main.ts"),
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: 'main.js',
-    },
-    devServer: {
-        contentBase: path.resolve(__dirname, "dist"),
     },
     resolve: {
         alias: {

@@ -43,37 +43,51 @@ export default class UserModule extends VuexModule {
     }
 
     @Action
-    register(username: string): Promise<any> {
-        this.setLoading(true);
-        let fd = new FormData();
-        fd.set("name", username);
-        return new Promise((resolve, reject) => {
-            let conf = UserService.set(username);
-            axios.request(conf)
-                .then((response: AxiosResponse<UserCreatedResponse>) => {
-                    let id = Number(response.data.user_id);
-                    this.setId(id);
-                    this.setError("");
-                    resolve();
-                }).catch((error: AxiosError) => {
-                    let message: string;
-                    if (error.response) {
-			if (!error.response.data && error.response.status === 404) {
-			    message = `Server not found at URL: '$config.baseUrl}"`;
-			} else if (error.response.data) {
-			    message = error.response.data;
-			} else {
-			    message = "Unkown error";
-			}
-                    } else {
-                        message = "Could not connect to server";
-                    }
-                    this.setId(null);
-                    this.setError(message);
-                    reject();
-                }).finally(() => {
-                    this.setLoading(false);
-                });
-        });
+    register(username: string): void {
+	this.setLoading(true);
+
+	let request = UserService.set(username);
+	axios(request)
+	    .then((response => {
+		let id = Number(response.data.user_id);
+		this.setId(id);
+		this.setError("");
+	    }))
+	    .catch(error => {
+		console.log(error);
+	    })
+	    .finally(() => this.setLoading(false));
+
+        // this.setLoading(true);
+        // let fd = new FormData();
+        // fd.set("name", username);
+        // return new Promise((resolve, reject) => {
+        //     let conf = UserService.set(username);
+        //     axios.request(conf)
+        //         .then((response: AxiosResponse<UserCreatedResponse>) => {
+        //             let id = Number(response.data.user_id);
+        //             this.setId(id);
+        //             this.setError("");
+        //             resolve(null);
+        //         }).catch((error: AxiosError) => {
+        //             let message: string;
+        //             if (error.response) {
+	// 		if (!error.response.data && error.response.status === 404) {
+	// 		    message = `Server not found at URL: '$config.baseUrl}"`;
+	// 		} else if (error.response.data) {
+	// 		    message = error.response.data;
+	// 		} else {
+	// 		    message = "Unkown error";
+	// 		}
+        //             } else {
+        //                 message = "Could not connect to server";
+        //             }
+        //             this.setId(null);
+        //             this.setError(message);
+        //             reject(null);
+        //         }).finally(() => {
+        //             this.setLoading(false);
+        //         });
+        // });
     }
 }
