@@ -21,6 +21,7 @@ import { FeedbackResponse } from "src/types";
 export default class FeedbackModule extends VuexModule {
     _feedback: Feedback = new Feedback();
     _loading: boolean = false;
+    _error: string = "";
 
     get feedback(): Feedback {
         return this._feedback;
@@ -41,65 +42,43 @@ export default class FeedbackModule extends VuexModule {
     }
 
     @Mutation
+    setError(err: string): void {
+        this._error = err;
+    }
+
+    @Mutation
     clear(): void {
         this._loading = false;
+        this._error = "";
         this._feedback = new Feedback();
     }
 
     @Action
     get(graph: Graph) {
-	let umod = getModule(UserModule);
-	let pmod = getModule(PetrinetModule);
-	let smod = getModule(SessionModule);
+        let umod = getModule(UserModule);
+        let pmod = getModule(PetrinetModule);
+        let smod = getModule(SessionModule);
 
-	this.setLoading(true);
-	let request = FeedbackService.get(umod.id, pmod.id, smod.id, graph);
-	axios(request)
-	    .then(response => {
-		let feedbackData = response.data;
-		let feedback = ResponseToFeedback.convert(feedbackData);
-		this.setFeedback(feedback);
-	    })
-	    .catch(error => {
-		console.log(error);
-	    })
-	    .finally(() => {
-		this.setLoading(false);
-	    });
+        this.setLoading(true);
+        let request = FeedbackService.get(umod.id, pmod.id, smod.id, graph);
+        axios(request)
+            .then(response => {
+                let feedbackData = response.data;
+                let feedback = ResponseToFeedback.convert(feedbackData);
+                this.setFeedback(feedback);
+            })
+            .catch(error => {
+                let message: string;
+                if (!error.response)
+                    message = "Could not connect to server";
+                else
+                    message = error.response?.data?.message;
+                message ??= "Unknown error";
+
+                this.setError(message);
+            })
+            .finally(() => {
+                this.setLoading(false);
+            });
     }
-
-    // @Action
-    // get(graph: Graph): Promise<any> {
-    //     let umod = getModule(UserModule);
-    //     let smod = getModule(SessionModule);
-    //     let pmod = getModule(PetrinetModule);
-    //     this.setLoading(true);
-    //     return new Promise((resolve, reject) => {
-    //         let config = FeedbackService.get(umod.id, pmod.id, smod.id, graph);
-    //         axios.request(config)
-    //             .then((response: AxiosResponse<FeedbackResponse>) => {
-    //                 let fr = response.data;
-    //                 let feedback = ResponseToFeedback.convert(fr);
-    //                 this.setFeedback(feedback);
-    //                 resolve();
-    //             }).catch((error: AxiosError) => {
-    //                 let message: string;
-    //                 if (error.response) {
-    //                     if (error.response.status === 404) {
-    //                         let config = Config.getInstance();
-    //                         message = `Server not found at: "${config.baseUrl}"`;
-    //                     } else if (error.response.data.error) {
-    //                         message = error.response.data.error;
-    //                     } else {
-    //                         message = "Unkown error";
-    //                     }
-    //                 } else {
-    //                     message = "Could not connect to server";
-    //                 }
-    //                 reject();
-    //             }).finally(() => {
-    //                 this.setLoading(false);
-    //             });
-    //     });
-    // }
 }

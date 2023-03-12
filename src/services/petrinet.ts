@@ -17,14 +17,14 @@ export default class PetrinetService {
         let conf = Config.getInstance();
         let fd = new FormData();
         fd.set("petrinet", file);
-	fd.set("user_id", uid.toString());
+        fd.set("user_id", uid.toString());
         return {
             baseURL: conf.baseUrl,
-	    url: conf.petrinetUrl + "/new",
+            url: conf.petrinetUrl + "/new",
             method: "post",
             data: fd,
             headers: {
-		"Accept": "application/json",
+                "Accept": "application/json",
                 "Content-Type": "multipart/form-data",
             }
         };
