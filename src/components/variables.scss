@@ -1,3 +1,5 @@
+@use "sass:math";
+
 $headerInnerHeight: 2.5rem;
 $headerPaddingT: .5rem;
 $headerPaddingB: .5rem;
@@ -26,5 +28,5 @@ $footerPaddingR: $headerPaddingR;
 
 $modellerHeight: calc(100vh - #{$headerHeight});
 $dividerWidth: .75rem;
-$resizerWidth: $dividerWidth / 3;
+$resizerWidth: math.div($dividerWidth, 3);
 $resizerHeight: 5rem;

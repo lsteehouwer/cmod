@@ -28,7 +28,7 @@ export default class PetrinetModule extends VuexModule {
     }
 
     get markingId(): number | null {
-	return this.mid;
+        return this.mid;
     }
 
     get petrinet(): Petrinet | null {
@@ -50,7 +50,7 @@ export default class PetrinetModule extends VuexModule {
 
     @Mutation
     setMarkingId(id: number | null): void {
-	this.mid = id;
+        this.mid = id;
     }
 
     @Mutation
@@ -69,86 +69,67 @@ export default class PetrinetModule extends VuexModule {
     }
 
     @Action
-    register(file: File | null): Promise<any> {
+    register(file: File | null): Promise<void> {
         let umod = getModule(UserModule);
-        return new Promise((resolve, reject) => {
-            if (!file) {
-                this.setError("No file selected");
-                reject();
-            } else if (umod.id === null) {
-                this.setError("No user logged in");
-                reject();
-            } else {
-                this.setLoading(true);
-                let conf = PetrinetService.set(umod.id, file);
-                axios.request(conf)
-                    .then((response: AxiosResponse<PetrinetCreatedResponse>) => {
-                        let id = Number(response.data.petrinet_id);
-			let mid = Number(response.data.marking_id);
-                        this.setError("");
-                        this.setId(id);
-			this.setMarkingId(mid);
-                        resolve();
-                    }).catch((error: AxiosError) => {
-                        let message: string;
-                        if (error.response) {
-			    if (!error.response.data && error.response.status === 404) {
-				let config = Config.getInstance();
-				message = `Server not found at URL: "${config.baseUrl}"`;
-			    } else if (error.response.data) {
-				message = error.response.data;
-			    } else {
-				message = "Unknown error";
-			    }
-                        } else {
-                            message = "Could not connect to server";
-                        }
-                        this.setId(null);
-                        this.setError(message);
-                        reject();
-                    }).finally(() => {
-                        this.setLoading(false);
-                    });
-            }
-        });
+        if (!file) {
+            this.setError("No file selected");
+            return;
+        } else if (umod.id === null) {
+            this.setError("No user logged in");
+            return;
+        }
+
+        this.setLoading(true);
+        let request = PetrinetService.set(umod.id, file);
+        return axios(request)
+            .then(response => {
+                this.setId(Number(response.data.petrinet_id));
+                this.setMarkingId(Number(response.data.marking_id));
+                this.setError("");
+            })
+            .catch(error => {
+                let message: string;
+                if (!error.response)
+                    message = "Could not connect to server";
+                else
+                    message = error.response?.data?.message;
+                message ??= "Unknown error";
+
+                this.setError(message);
+            })
+            .finally(() => {
+                this.setLoading(false);
+            });
     }
 
     @Action
-    get(): Promise<any> {
-        return new Promise((resolve, reject) => {
-            if (this.id === null) {
-                this.setError("Could not retrieve Petri net as no id is supplied");
-                reject();
-            } else {
-                this.setLoading(true);
-                let conf = PetrinetService.get(this.id, this.mid);
-                axios.request(conf)
-                    .then((response: AxiosResponse<MarkedPetrinetResponse>) => {
-                        let net = response.data.petrinet;
-                        let cnet = ResponseToPetrinet.convert(net);
-                        this.setPetrinet(cnet);
-                        this.setError("");
-                        resolve();
-                    }).catch((error: AxiosError) => {
-                        let message: string;
-                        if (error.response) {
-                            if (error.response.status === 404) {
-                                let config = Config.getInstance();
-                                message = `Server not found at URL: "${config.baseUrl}"`;
-                            } else if (error.response.data) {
-                                message = error.response.data;
-                            } else {
-                                message = "Unkown error";
-                            }
-                        } else {
-                            message = "Could not connect to server";
-                        }
-                        this.setError(message);
-                        reject();
-                    }).finally(() => {
-                        this.setLoading(false);
-                    });
-            }
-        });
+    get(): void {
+        if (this.id === null) {
+            this.setError("Could not retrieve Petri net: no id supplied");
+            return;
+        }
+
+        this.setLoading(true);
+        let request = PetrinetService.get(this.id, this.mid);
+        axios(request)
+            .then(response => {
+                let net = response.data.petrinet;
+                let cnet = ResponseToPetrinet.convert(net);
+                this.setPetrinet(cnet);
+                this.setError("");
+            })
+            .catch(error => {
+                let message: string;
+                if (!error.response)
+                    message = "Could not connect to server";
+                else
+                    message = error.response?.data?.message;
+                message ??= "Unknown error";
+
+                this.setError(message);
+            })
+            .finally(() => {
+                this.setLoading(false);
+            });
     }
 }

@@ -49,37 +49,31 @@ export default class SessionModule extends VuexModule {
         let umod = getModule(UserModule);
         let pmod = getModule(PetrinetModule);
 
-        return new Promise((resolve, reject) => {
-            if (umod.id === null || pmod.id === null || pmod.mid === null) {
-                this.setError("Not enough information to start the session");
-            } else {
-                this.setLoading(true);
-                let conf = SessionService.set(umod.id, pmod.id, pmod.mid);
-                axios.request(conf)
-                    .then((response: AxiosResponse<SessionCreatedResponse>) => {
-                        let sid = response.data.session_id;
-                        this.setId(sid);
-                        return resolve();
-                    }).catch((error: AxiosError) => {
-                        let message: string;
-                        if (error.response) {
-			    if (!error.response.data && error.response.status === 404) {
-				let config = Config.getInstance();
-                                 message = `Server not found at: "${config.baseUrl}"`;
-			    } else if (error.response.data) {
-				message = error.response.data;
-			    } else {
-				message = "Unkown error";
-			    }
-                        } else {
-                            message = "Could not connect to server";
-                        }
-                        this.setId(null);
-                        this.setError(message);
-                    }).finally(() => {
-                        this.setLoading(false);
-                    });
-            }
-        });
+        if (umod.id === null || pmod.id === null || pmod.mid === null) {
+            this.setError("Not enough information to start the session");
+            return;
+        }
+
+        this.setLoading(true);
+        let request = SessionService.set(umod.id, pmod.id, pmod.mid);
+
+        axios(request)
+            .then(response => {
+                let sid = response.data.session_id;
+                this.setId(Number(sid));
+            })
+            .catch(error => {
+                let message: string;
+                if (!error.response)
+                    message = "Could not connect to server";
+                else
+                    message = error.response?.data?.message;
+                message ??= "Unknown error";
+
+                this.setError(message);
+            })
+            .finally(() => {
+                this.setLoading(false);
+            });
     }
 }

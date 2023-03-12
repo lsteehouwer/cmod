@@ -29,7 +29,7 @@
     transform: translateY(-50%);
     transition-property: background;
     transition-duration: 0s;
-    transition-delay: $menuTransitionDuration / 2;
+    transition-delay: $menuTransitionDuration * 0.5;
     border-radius: 5px;
 }
 
@@ -43,8 +43,8 @@
     height: .25em;
     background: $white;
     transition-property: top, transform;
-    transition-duration: $menuTransitionDuration / 2, $menuTransitionDuration / 2;
-    transition-delay: $menuTransitionDuration / 2, 0s;
+    transition-duration: $menuTransitionDuration * 0.5, $menuTransitionDuration * 0.5;
+    transition-delay: $menuTransitionDuration * 0.5, 0s;
     border-radius: 5px;
 }
 
@@ -58,8 +58,8 @@
     height: .25em;
     background: $white;
     transition-property: top, transform;
-    transition-duration:  $menuTransitionDuration / 2,  $menuTransitionDuration / 2;
-    transition-delay:  $menuTransitionDuration / 2, 0s;
+    transition-duration:  $menuTransitionDuration * 0.5,  $menuTransitionDuration * 0.5;
+    transition-delay:  $menuTransitionDuration * 0.5, 0s;
     border-radius: 5px;
 }
 
@@ -74,11 +74,11 @@
 .menu-toggle.open .bar::before {
     top: 0;
     transform: rotate(45deg);
-    transition-delay: 0s,  $menuTransitionDuration / 2;
+    transition-delay: 0s,  $menuTransitionDuration * 0.5;
 }
 
 .menu-toggle.open .bar::after {
     top: -0.25em;
     transform: rotate(-45deg);
-    transition-delay: 0s,  $menuTransitionDuration / 2;
+    transition-delay: 0s,  $menuTransitionDuration * 0.5;
 }

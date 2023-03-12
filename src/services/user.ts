@@ -11,6 +11,9 @@ export default class UserService {
             baseURL: baseUrl,
             url: userUrl + `/${id}`,
             method: "get",
+            headers: {
+                "Accept": "application/json"
+            }
         };
     }
 
@@ -27,6 +30,7 @@ export default class UserService {
             method: "post",
             data: fd,
             headers: {
+                "Accept": "application/json",
                 "Content-Type": "multipart/form-data"
             }
         };
@@ -39,7 +43,10 @@ export default class UserService {
         return {
             baseURL: baseUrl,
             url: userUrl + `/${limit}/${page}`,
-            method: "get"
+            method: "get",
+            headers: {
+                "Accept": "application/json"
+            }
         };
     }
 }

@@ -1,5 +1,5 @@
 import FeedbackCode from "./feedback-code";
-import FeedbackRecord from "./feedback-record.ts";
+import FeedbackRecord from "./feedback-record";
 
 import HashTable from "src/hash-table/hash-table";
 

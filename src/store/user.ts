@@ -43,37 +43,27 @@ export default class UserModule extends VuexModule {
     }
 
     @Action
-    register(username: string): Promise<any> {
+    register(username: string): void {
         this.setLoading(true);
-        let fd = new FormData();
-        fd.set("name", username);
-        return new Promise((resolve, reject) => {
-            let conf = UserService.set(username);
-            axios.request(conf)
-                .then((response: AxiosResponse<UserCreatedResponse>) => {
-                    let id = Number(response.data.user_id);
-                    this.setId(id);
-                    this.setError("");
-                    resolve();
-                }).catch((error: AxiosError) => {
-                    let message: string;
-                    if (error.response) {
-			if (!error.response.data && error.response.status === 404) {
-			    message = `Server not found at URL: '$config.baseUrl}"`;
-			} else if (error.response.data) {
-			    message = error.response.data;
-			} else {
-			    message = "Unkown error";
-			}
-                    } else {
-                        message = "Could not connect to server";
-                    }
-                    this.setId(null);
-                    this.setError(message);
-                    reject();
-                }).finally(() => {
-                    this.setLoading(false);
-                });
-        });
+
+        let request = UserService.set(username);
+        axios(request)
+            .then((response => {
+                let id = Number(response.data.user_id);
+                this.setId(id);
+                this.setError("");
+            }))
+            .catch(error => {
+                let message: string;
+                if (!error.response)
+                    message = "Could not connect to server";
+                else
+                    message = error.response?.data?.message
+
+                message ??= "Unknown error";
+
+                this.setError(message);
+            })
+            .finally(() => this.setLoading(false));
     }
 }
