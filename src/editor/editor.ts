@@ -83,6 +83,9 @@ export default class Editor {
     }
 
     public addEdge(edge: Edge): void {
+        if (!this.graph.hasState(edge.from) || !this.graph.hasState(edge.to))
+            return;
+
         let a = new AddEdge(this, edge);
         this.historyList.exec(a);
     }

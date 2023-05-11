@@ -85,7 +85,7 @@ export default class Graph {
     set initial(id: number | null) {
         this._initial = id;
     }
-    
+
     get states(): HashTable<number, State> {
         return this._states;
     }
@@ -94,4 +94,3 @@ export default class Graph {
         return this._edges;
     }
 }
-
